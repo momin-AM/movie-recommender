@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual env
+myvenv/
+
+# Model files (optional: keep if small)
+model/*.pkl
+
+# Data (optional)
+data/*.csv
+
+# OS
+.DS_Store

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie Recommender 🎬</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="container">
+        <h1>🎬 Movie Recommender</h1>
+
+        <form method="POST">
+            <input type="text" name="movie" placeholder="Enter movie name" required>
+            <button type="submit">Recommend</button>
+        </form>
+
+        {% if recommendations %}
+            <div class="results">
+                <h2>Recommendations:</h2>
+                <ul>
+                    {% for movie in recommendations %}
+                        <li>{{ movie }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>
