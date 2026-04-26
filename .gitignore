@@ -6,10 +6,10 @@ __pycache__/
 myvenv/
 
 # Model files (optional: keep if small)
-# model/*.pkl
+model/*.pkl
 
 # Data (optional)
-data/*.csv
+# data/*.csv
 
 # OS
 .DS_Store
