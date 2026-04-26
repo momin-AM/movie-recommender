@@ -13,3 +13,4 @@ model/*.pkl
 
 # OS
 .DS_Store
+model/similarity.pkl
