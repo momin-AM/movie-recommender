@@ -1,16 +1,26 @@
 from flask import Flask, render_template, request
-from src.model import load_model
-from src.recommend import recommend
+import os
 import sqlite3
 from datetime import datetime
-from flask import request
+
+from src.model import train_model, save_model, load_model
 
 app = Flask(__name__)
 
-# load model once
-movies, similarity = load_model()
+# -------------------------
+# Load or Train Model
+# -------------------------
+if not os.path.exists("model/similarity.pkl"):
+    print("Training model...")
+    similarity, movies = train_model()
+    save_model(similarity, movies)
+else:
+    print("Loading model...")
+    similarity, movies = load_model()
 
-
+# -------------------------
+# Recommendation Logic
+# -------------------------
 def get_recommendations(movie):
     movie = movie.lower()
     matches = movies[movies['title'].str.lower().str.contains(movie)]
@@ -29,24 +39,9 @@ def get_recommendations(movie):
 
     return [movies.iloc[i[0]].title for i in movie_list]
 
-
-@app.route("/", methods=["GET", "POST"])
-@app.route("/", methods=["GET", "POST"])
-def home():
-    recommendations = []
-
-    if request.method == "POST":
-        movie = request.form["movie"]
-
-        # 👇 get user IP
-        ip = request.remote_addr
-
-        # 👇 log search
-        log_search(ip, movie)
-
-        recommendations = get_recommendations(movie)
-
-    return render_template("index.html", recommendations=recommendations)
+# -------------------------
+# Database
+# -------------------------
 def init_db():
     conn = sqlite3.connect("searches.db")
     c = conn.cursor()
@@ -75,7 +70,27 @@ def log_search(ip, movie):
     conn.commit()
     conn.close()
 
+# -------------------------
+# Routes
+# -------------------------
+@app.route("/", methods=["GET", "POST"])
+def home():
+    recommendations = []
 
+    if request.method == "POST":
+        movie = request.form.get("movie")
+
+        if movie:
+            ip = request.remote_addr
+            log_search(ip, movie)
+            recommendations = get_recommendations(movie)
+
+    return render_template("index.html", recommendations=recommendations)
+
+# -------------------------
+# Run App
+# -------------------------
 if __name__ == "__main__":
     init_db()
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
